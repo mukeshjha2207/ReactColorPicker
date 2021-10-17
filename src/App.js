@@ -3,7 +3,8 @@ import { Image as MyImage } from './components/Image'
 import { Swatches } from './components/Swatches'
 import { SearchInput } from './components/SearchInput'
 import { FileInput } from './components/UploadButton'
-import { SwatchesPicker } from 'react-color';
+import Draggable from 'react-draggable';
+
 
 const IMAGE = 'https://i.imgur.com/OCyjHNF.jpg'
 
@@ -13,6 +14,7 @@ export default class App extends React.Component {
   state = {
     image: IMAGE,
     colors: [],
+    bounds: [],
     hasError: false,
     canvas: {
       width: 0,
@@ -22,8 +24,7 @@ export default class App extends React.Component {
 
 
 
-  getCanvasImage = (x, y) => {
-
+  getPixelColor = (x, y) => {
     var img = document.getElementById('image');
     var canvas = document.createElement('canvas');
     canvas.width = img.width;
@@ -57,10 +58,13 @@ export default class App extends React.Component {
 
       e.preventDefault()
     })
+
+    var img = document.getElementById('image');
+    let bounds = img.getBoundingClientRect()
+    this.setState({ bounds })
   }
 
   uploadFiles = e => {
-    this.clearCanvas()
     this.setState({
       image: window.URL.createObjectURL(e.target.files[0]),
       hasError: false
@@ -84,7 +88,6 @@ export default class App extends React.Component {
       .catch(err => (err ? this.setState({ hasError: true }) : null))
 
 
-
   render() {
     return (
       <div
@@ -94,15 +97,17 @@ export default class App extends React.Component {
         }}
       >
         <Heading />
-        <div style={{ backgroundColor: this.state.color }}> {this.state.color}</div>
+        <div style={{ backgroundColor: this.state.color, padding: 20, marginBottom: 20, color: 'grey' }}> {this.state.color} </div>
         <MyImage
           error={this.state.hasError}
           image={this.state.image}
           getColors={this.getColors}
-          // ImageLoad={() => this.getCanvasImage()}
-          onCursurMove={(x, y) => this.setState({ color: this.getCanvasImage(x, y) })}
+          getPixelColor={this.getPixelColor}
+          colors={this.state.colors}
+          onCursurMove={(x, y) => this.setState({ color: this.getPixelColor(x, y) })}
           onError={error => this.setState({ hasError: true })}
         />
+
         <SearchInput
           imagePath={this.state.image === IMAGE ? '' : this.state.image}
           handleImage={this.handleImage}
