@@ -4,6 +4,7 @@ import { Swatches } from './components/Swatches'
 import { SearchInput } from './components/SearchInput'
 import { FileInput } from './components/UploadButton'
 import { SwatchesPicker } from 'react-color';
+
 const IMAGE = 'https://i.imgur.com/OCyjHNF.jpg'
 
 const Heading = props => <h1 className="heading">Image Color Extractor</h1>
@@ -19,8 +20,29 @@ export default class App extends React.Component {
     }
   }
 
+
+
+  getCanvasImage = (x, y) => {
+
+    var img = document.getElementById('image');
+    var canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    img.crossOrigin = 'anonymous';
+    canvas.height = img.height;
+    canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+    var pixelData = canvas.getContext('2d').getImageData(x, y, 1, 1).data;
+    let color = `rgba(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]}, ${pixelData[3] / 255})`;
+    const rgba = color.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
+    color = `#${((1 << 24) + (parseInt(rgba[0]) << 16) + (parseInt(rgba[1]) << 8) + parseInt(rgba[2])).toString(16).slice(1)}`;
+    return color
+
+
+  }
+
+
   componentDidMount() {
-    this.updateCanvas()
+    //this.getCanvasImage()
+
     const searchInput = document.getElementById('s-input')
 
     searchInput.focus()
@@ -42,7 +64,7 @@ export default class App extends React.Component {
     this.setState({
       image: window.URL.createObjectURL(e.target.files[0]),
       hasError: false
-    }, this.updateCanvas)
+    })
   }
 
   getColors = colors => {
@@ -50,7 +72,6 @@ export default class App extends React.Component {
   }
 
   handleImage = e => {
-
     this.isResponseOk(e.target.value)
     this.setState({ image: e.target.value })
   }
@@ -63,43 +84,8 @@ export default class App extends React.Component {
       .catch(err => (err ? this.setState({ hasError: true }) : null))
 
 
-  clearCanvas = () => {
-    const ctx = this.refs.canvas.getContext('2d');
-    let { width, height, xOffset, yOffset } = this.canvas
-
-    ctx.clearRect(xOffset, yOffset, width, height);
-  }
-  updateCanvas = () => {
-    this.canvas = {}
-    const ctx = this.refs.canvas.getContext('2d');
-    var imageObj1 = new Image();
-    imageObj1.src = this.state.image
-    imageObj1.onload = function () {
-      var canvas = document.getElementById('canvas');
-      var wrh = imageObj1.width / imageObj1.height;
-      var newWidth = canvas.width;
-      var newHeight = newWidth / wrh;
-      if (newHeight > canvas.height) {
-        newHeight = canvas.height;
-        newWidth = newHeight * wrh;
-      }
-      var xOffset = newWidth < canvas.width ? ((canvas.width - newWidth) / 2) : 0;
-      var yOffset = newHeight < canvas.height ? ((canvas.height - newHeight) / 2) : 0;
-
-      let canvaswh = { width: newWidth, height: newHeight, xOffset, yOffset }
-
-      canvas = canvaswh
-
-      ctx.drawImage(imageObj1, xOffset, yOffset, newWidth, newHeight);
-
-    }
-
-  }
-
 
   render() {
-
-
     return (
       <div
         className="center-content"
@@ -108,12 +94,13 @@ export default class App extends React.Component {
         }}
       >
         <Heading />
-        <canvas ref="canvas" id="canvas" className="canvas" />
-
+        <div style={{ backgroundColor: this.state.color }}> {this.state.color}</div>
         <MyImage
           error={this.state.hasError}
           image={this.state.image}
           getColors={this.getColors}
+          // ImageLoad={() => this.getCanvasImage()}
+          onCursurMove={(x, y) => this.setState({ color: this.getCanvasImage(x, y) })}
           onError={error => this.setState({ hasError: true })}
         />
         <SearchInput
@@ -122,11 +109,13 @@ export default class App extends React.Component {
           getColors={this.getColors}
         />
         <FileInput uploadFiles={this.uploadFiles} />
-        {this.state.colors.length > 0 ? (
-          <Swatches colors={this.state.colors} />
-        ) : null}
+        {
+          this.state.colors.length > 0 ? (
+            <Swatches colors={this.state.colors} />
+          ) : null
+        }
 
-      </div>
+      </div >
     )
   }
 }

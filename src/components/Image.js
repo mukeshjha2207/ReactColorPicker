@@ -11,7 +11,11 @@ export const Image = props =>
   ) : (
     <div className="image-container">
       <ColorExtractor getColors={props.getColors} onError={props.onError}>
-        <img src={props.image} />
+        <img id="image" src={props.image} onMouseMove={(event) => {
+          console.log(event)
+          props.onCursurMove(event.pageX, event.pageY)
+        }
+        } />
       </ColorExtractor>
     </div>
   )

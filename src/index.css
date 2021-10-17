@@ -3,9 +3,10 @@ body {
   color: #2f2f2f;
 }
 
-.canvas {
+.canvas1 {
   margin-top: 100;
-  width:80%;
+  height: 500px;
+  width: 700px;
   position: absolute;
   top: 50%;  /* position the top  edge of the element at the middle of the parent */
   left: 50%; /* position the left edge of the element at the middle of the parent */
@@ -15,7 +16,7 @@ body {
 }
 
 .image-container {
-  visibility: hidden;
+  visibility: visible;
   -webkit-box-shadow: 10px 10px 9px -11px rgba(122, 121, 122, 1);
   -moz-box-shadow: 10px 10px 9px -11px rgba(122, 121, 122, 1);
   box-shadow: 10px 10px 9px -11px rgba(122, 121, 122, 1);
@@ -104,6 +105,7 @@ footer {
   img {
     width: 300px;
     height: 200px;
+    cursor: pointer;
   }
 
   .search-input {
