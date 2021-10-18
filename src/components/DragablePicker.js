@@ -16,10 +16,9 @@ const DragablePicker = props => {
     const handleDrag = (e, data) => {
         var img = document.getElementById('image');
         var handel = document.getElementById('handel');
-
         let bounds = img.getBoundingClientRect()
         let handelBound = data.node.getBoundingClientRect()
-        console.log(bounds, handelBound)
+        console.log("bounds", bounds, handelBound)
 
         if (bounds.top <= handelBound.top &&
             bounds.left <= handelBound.top &&
@@ -33,13 +32,12 @@ const DragablePicker = props => {
 
     }
 
-
     return (
 
-
         <Draggable
-            position={location}
+            defaultPosition={location}
             scale={1}
+            //bounds={{ left: 5, right: 670, top: 170, bottom: 0 }}
             // onStart={handleDrag}
             onStop={handleDrag}
         >

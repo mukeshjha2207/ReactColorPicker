@@ -22,13 +22,13 @@ export const Image = props => {
     </div>
   ) : (
     <div>
-      {props.colors.map((color, index) =>
+      {props.colors.map((color, index) =>// dummy location need to get the actual one from image
         <DragablePicker defaultLocation={{ x: 0 + (index + 50), y: 180 + (index * 50) }} defaultColor={color} getPixelColor={props.getPixelColor} />
       )}
       <div className="image-container">
         <ColorExtractor getColors={props.getColors} onError={props.onError}>
           <img id="image" src={props.image} onMouseMove={(event) => {
-            console.log(event)
+            //console.log(event)
             props.onCursurMove(event.pageX, event.pageY)
           }
           } />
