@@ -1,6 +1,4 @@
 import React, { useState } from 'react'
-
-import { ColorExtractor } from 'react-color-extractor'
 import Draggable from 'react-draggable';
 
 
@@ -18,7 +16,7 @@ const DragablePicker = props => {
         var handel = document.getElementById('handel');
         let bounds = img.getBoundingClientRect()
         let handelBound = data.node.getBoundingClientRect()
-        console.log("bounds", bounds, handelBound)
+        // console.log("bounds", bounds, handelBound)
 
         if (bounds.top <= handelBound.top &&
             bounds.left <= handelBound.top &&
@@ -38,7 +36,7 @@ const DragablePicker = props => {
             defaultPosition={location}
             scale={1}
             //bounds={{ left: 5, right: 670, top: 170, bottom: 0 }}
-            // onStart={handleDrag}
+            onStart={handleDrag}
             onStop={handleDrag}
         >
             <div id="handle" className="handle" style={{ backgroundColor: color }} />
