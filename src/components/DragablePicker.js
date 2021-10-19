@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Draggable from 'react-draggable';
 
 
@@ -6,6 +6,16 @@ const DragablePicker = props => {
     var img = document.getElementById('image');
     const [location, setLocation] = useState(props.defaultLocation)
     const [color, setColor] = useState(props.defaultColor)
+
+    useEffect(() => {
+        setColor(props.defaultColor)
+    }, [props.defaultColor])
+
+
+
+
+
+
     const handleStart = (e, data) => {
         var img = document.getElementById('image');
         let bounds = img.getBoundingClientRect()

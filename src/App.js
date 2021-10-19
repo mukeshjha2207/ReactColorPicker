@@ -24,6 +24,7 @@ export default class App extends React.Component {
 
 
 
+
   getPixelColor = (x, y) => {
     var img = document.getElementById('image');
     var canvas = document.createElement('canvas');
@@ -36,7 +37,6 @@ export default class App extends React.Component {
     const rgba = color.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
     color = `#${((1 << 24) + (parseInt(rgba[0]) << 16) + (parseInt(rgba[1]) << 8) + parseInt(rgba[2])).toString(16).slice(1)}`;
     return color
-
 
   }
 
@@ -72,6 +72,7 @@ export default class App extends React.Component {
   }
 
   getColors = colors => {
+    console.log("getColors", colors)
     this.setState(state => ({ colors: [...colors], hasError: false }))
   }
 
@@ -89,6 +90,7 @@ export default class App extends React.Component {
 
 
   render() {
+    let { colors, image, hasError } = this.state
     return (
       <div
         className="center-content"
@@ -99,11 +101,11 @@ export default class App extends React.Component {
         <Heading />
         <div style={{ backgroundColor: this.state.color, padding: 20, marginBottom: 20, color: 'grey' }}> {this.state.color} </div>
         <MyImage
-          error={this.state.hasError}
-          image={this.state.image}
+          error={hasError}
+          image={image}
           getColors={this.getColors}
           getPixelColor={this.getPixelColor}
-          colors={this.state.colors}
+          colors={colors}
           onCursurMove={(x, y) => this.setState({ color: this.getPixelColor(x, y) })}
           onError={error => this.setState({ hasError: true })}
         />
