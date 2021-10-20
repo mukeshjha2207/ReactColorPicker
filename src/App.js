@@ -3,65 +3,55 @@ import { Image as MyImage } from './components/Image'
 import { Swatches } from './components/Swatches'
 import { SearchInput } from './components/SearchInput'
 import { FileInput } from './components/UploadButton'
-import Draggable from 'react-draggable';
-
+import { createCanvas, loadImage } from 'canvas'
+import ColorFinder from 'color-finder'
 
 const IMAGE = 'https://i.imgur.com/OCyjHNF.jpg'
 
 const Heading = props => <h1 className="heading">Image Color Extractor</h1>
 
 export default class App extends React.Component {
+
   state = {
     image: IMAGE,
+    colorFinder: null,
     colors: [],
-    bounds: [],
+    color: '#000000',
     hasError: false,
-    canvas: {
-      width: 0,
-      height: 0
+  }
+
+  updateImage () {
+    const image = document.getElementById('image');
+    image.crossOrigin = 'anonymous';
+    image.onload = () => {
+      const canvas = createCanvas(image.width, image.height);
+      canvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height);
+      const colorFinder = new ColorFinder(canvas);
+      this.setState({ 
+        colorFinder: colorFinder,
+        colors: colorFinder.mainColors
+      });
     }
   }
 
-
-
-
-  getPixelColor = (x, y) => {
-    var img = document.getElementById('image');
-    var canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    img.crossOrigin = 'anonymous';
-    canvas.height = img.height;
-    canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-    var pixelData = canvas.getContext('2d').getImageData(x, y, 1, 1).data;
-    let color = `rgba(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]}, ${pixelData[3] / 255})`;
-    const rgba = color.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
-    color = `#${((1 << 24) + (parseInt(rgba[0]) << 16) + (parseInt(rgba[1]) << 8) + parseInt(rgba[2])).toString(16).slice(1)}`;
-    return color
-
-  }
-
-
   componentDidMount() {
-    //this.getCanvasImage()
-
     const searchInput = document.getElementById('s-input')
-
     searchInput.focus()
-
     const uploader = document.getElementById('uploader')
     const button = document.getElementById('file-upload')
-
     button.addEventListener('click', e => {
       if (uploader) {
         uploader.click()
       }
-
       e.preventDefault()
     })
+    this.updateImage();
+  }
 
-    var img = document.getElementById('image');
-    let bounds = img.getBoundingClientRect()
-    this.setState({ bounds })
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.image !== prevState.image) {
+      this.updateImage();
+    }
   }
 
   uploadFiles = e => {
@@ -71,14 +61,10 @@ export default class App extends React.Component {
     })
   }
 
-  getColors = colors => {
-    console.log("getColors", colors)
-    this.setState(state => ({ colors: [...colors], hasError: false }))
-  }
-
   handleImage = e => {
-    this.isResponseOk(e.target.value)
-    this.setState({ image: e.target.value })
+    this.isResponseOk(e.target.value);
+    const image = e.target.value;
+    this.setState({ image: image });
   }
 
   isResponseOk = path =>
@@ -90,7 +76,7 @@ export default class App extends React.Component {
 
 
   render() {
-    let { colors, image, hasError } = this.state
+    let { colorFinder, image, hasError } = this.state
     return (
       <div
         className="center-content"
@@ -103,11 +89,8 @@ export default class App extends React.Component {
         <MyImage
           error={hasError}
           image={image}
-          getColors={this.getColors}
-          getPixelColor={this.getPixelColor}
-          colors={colors}
-          onCursurMove={(x, y) => this.setState({ color: this.getPixelColor(x, y) })}
-          onError={error => this.setState({ hasError: true })}
+          colorFinder={colorFinder}
+          setColor={(color) => this.setState({ color: color })}
         />
 
         <SearchInput

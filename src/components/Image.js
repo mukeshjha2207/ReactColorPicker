@@ -1,45 +1,50 @@
 import React, { useEffect, useState } from 'react'
 
-import { ColorExtractor } from 'react-color-extractor'
 import DragablePicker from './DragablePicker'
 
 export const Image = props => {
-  var img = document.getElementById('image');
-  const [color, setColor] = useState(props.colors)
 
+  const {
+    error,
+    image,
+    colorFinder,
+    setColor
+  } = props;
+
+  const [colors, setColors] = useState([]);
 
   useEffect(() => {
-    console.log("useEffect called", props.colors)
-    setColor(props.colors)
-  }, [props.colors])
+    if (colorFinder !== null && colorFinder !== undefined) {
+      setColors(colorFinder.mainColors)
+    }
+  }, [colorFinder])
 
-  // const handleStart = (e, data) => {
-  //   var img = document.getElementById('image');
-  //   let bounds = img.getBoundingClientRect()
-  //   console.log(bounds, data)
-  // }
+  const img = document.getElementById('image');
+  const layout = img?.getBoundingClientRect();
 
-  return props.error ? (
+  return error ? (
     <div className="error-message">
       An error occurred while processing the image.
     </div>
   ) : (
     <div>
-      {color.map((color, index) =>// dummy location need to get the actual one from image
-        <DragablePicker key={index.toString()} defaultLocation={{ x: 0 + (index + 50), y: 180 + (index * 50) }} defaultColor={color} getPixelColor={props.getPixelColor} />
+      {colors.map((color, index) =>
+        <DragablePicker 
+          key={index} 
+          defaultLocation={colorFinder.locateColor(color, layout)} 
+          defaultColor={color} 
+          getPixelColor={(x, y) => colorFinder.colorAtPos(x, y, layout)} 
+        />
       )}
       <div className="image-container">
-        <ColorExtractor getColors={props.getColors} onError={props.onError}>
-          <img id="image" src={props.image} onMouseMove={(event) => {
-            //  console.log(event)
-            // var canvas = document.createElement('canvas');
-            props.onCursurMove(event.pageX, event.pageY)
+        <img 
+          id="image" 
+          src={image} 
+          onMouseMove={e => 
+            setColor(colorFinder.colorAtPagePos(e.pageX, e.pageY, layout))
           }
-          } />
-        </ColorExtractor>
-
+        />
       </div >
-
     </div >
   )
 }
