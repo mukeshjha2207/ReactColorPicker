@@ -3,57 +3,43 @@ import Draggable from 'react-draggable';
 
 
 const DragablePicker = props => {
-    var img = document.getElementById('image');
     const [location, setLocation] = useState(props.defaultLocation)
     const [color, setColor] = useState(props.defaultColor)
 
     useEffect(() => {
+        setLocation(props.defaultLocation)
         setColor(props.defaultColor)
     }, [props.defaultColor])
+    
+    const img = document.getElementById('image');
+    const imgBounds = img.getBoundingClientRect();
 
-
-
-
-
-
-    const handleStart = (e, data) => {
-        var img = document.getElementById('image');
-        let bounds = img.getBoundingClientRect()
-        console.log(bounds, data)
-    }
     const handleDrag = (e, data) => {
-        var img = document.getElementById('image');
-        var handel = document.getElementById('handel');
-        let bounds = img.getBoundingClientRect()
-        let handelBound = data.node.getBoundingClientRect()
-        // console.log("bounds", bounds, handelBound)
-
-        if (bounds.top <= handelBound.top &&
-            bounds.left <= handelBound.top &&
-            bounds.right >= handelBound.right &&
-            bounds.bottom >= handelBound.bottom) {
-            //the div is inside the canvas.
-            setLocation({ x: handelBound.x - 100, y: handelBound.y - 60 })
-            setColor(props.getPixelColor(handelBound.x - 90, handelBound.y - 100))
-
-        }
-
+        const handleBounds = document.getElementById('handle').getBoundingClientRect();
+        const x = Math.min(
+            imgBounds.width - handleBounds.width / 2,
+            Math.max(-handleBounds.width / 2, data.x)
+        );
+        const y = Math.min(
+            imgBounds.height - handleBounds.height / 2,
+            Math.max(-handleBounds.height / 2, data.y)
+        );
+        const location = { x, y };
+        setLocation(location);
+        setColor(props.getPixelColor(
+            x + handleBounds.width / 2, 
+            y + handleBounds.height / 2
+        ));
     }
 
     return (
 
         <Draggable
-            defaultPosition={location}
-            scale={1}
-            //bounds={{ left: 5, right: 670, top: 170, bottom: 0 }}
-            onStart={handleDrag}
-            onStop={handleDrag}
+            position={location}
+            onDrag={handleDrag}
         >
-            <div id="handle" className="handle" style={{ backgroundColor: color }} />
+            <div id="handle" className="handle" style={{ backgroundColor: color, position: 'absolute' }} />
         </Draggable>
-
-
-
     )
 
 }
