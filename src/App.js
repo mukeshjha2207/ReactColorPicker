@@ -26,10 +26,10 @@ export default class App extends React.Component {
     image.onload = () => {
       const canvas = createCanvas(image.width, image.height);
       canvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height);
-      const colorFinder = new ColorFinder(canvas);
+      const colorFinder = ColorFinder.fromCanvas(canvas);
       this.setState({ 
         colorFinder: colorFinder,
-        colors: colorFinder.mainColors
+        colors: colorFinder.mainColors()
       });
     }
   }

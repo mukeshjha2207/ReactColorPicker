@@ -15,7 +15,7 @@ export const Image = props => {
 
   useEffect(() => {
     if (colorFinder !== null && colorFinder !== undefined) {
-      setColors(colorFinder.mainColors)
+      setColors(colorFinder.mainColors())
     }
   }, [colorFinder])
 
